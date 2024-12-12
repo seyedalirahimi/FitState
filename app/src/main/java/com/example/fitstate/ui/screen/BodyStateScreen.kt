@@ -35,7 +35,6 @@ import com.example.fitstate.ui.viewModel.BodyStateAction
 import com.example.fitstate.ui.viewModel.BodyStateUiState
 import com.example.fitstate.ui.viewModel.BodyStateViewModel
 import kotlinx.datetime.Clock
-import kotlinx.datetime.format.*
 
 @Composable
 fun BodyStateScreenRoot(
@@ -55,7 +54,9 @@ fun BodyStateScreen(
 ) {
 
     Column {
-        BodyStateList(bodyStates = state.bodyStates)
+        if (!state.isLoading && state.bodyStates.isNotEmpty()){
+            WeightChart(bodyStates = state.bodyStates)
+        }
         Row(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
         ) {
@@ -64,6 +65,8 @@ fun BodyStateScreen(
                 Text("Add Body State")
             }
         }
+
+        BodyStateList(bodyStates = state.bodyStates)
 
     }
 

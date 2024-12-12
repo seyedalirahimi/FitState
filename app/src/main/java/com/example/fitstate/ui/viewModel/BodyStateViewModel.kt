@@ -24,7 +24,7 @@ class BodyStateViewModel @Inject constructor(
     init {
         bodyStateCollectionJob = viewModelScope.launch {
             bodyStateRepository.getBodyStates().collect { bodyStates ->
-                _state.update { it.copy(bodyStates = bodyStates) }
+                _state.update { it.copy(bodyStates = bodyStates, isLoading = false) }
             }
         }
     }

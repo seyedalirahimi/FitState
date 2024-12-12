@@ -4,8 +4,7 @@ import com.example.fitstate.ui.model.BodyState
 import kotlinx.coroutines.flow.Flow
 
 interface BodyStateRepository {
-    suspend fun upsert(book: BodyState)
+    suspend fun upsert(bodyState: BodyState)
     suspend fun getBodyStates(): Flow<List<BodyState>>
-    suspend fun getBodyState(id: Int): BodyState?
-    suspend fun deleteBodyState(id: Int)
+    suspend fun deleteBodyState(bodyState: BodyState)
 }

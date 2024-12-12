@@ -5,15 +5,15 @@ import com.example.fitstate.ui.model.toBodyStateEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.ali.fitState.data.database.BodyStateDao
-import org.ali.fitState.data.database.toBodyState
+import com.example.fitstate.data.database.toBodyState
 import javax.inject.Inject
 
 
 class BodyStateRepositoryImpl @Inject constructor(
     private val bodyStateDao: BodyStateDao
 ) : BodyStateRepository {
-    override suspend fun upsert(book: BodyState) {
-        bodyStateDao.upsert(book.toBodyStateEntity())
+    override suspend fun upsert(bodyState: BodyState) {
+        bodyStateDao.upsert(bodyState.toBodyStateEntity())
     }
 
     override suspend fun getBodyStates(): Flow<List<BodyState>> {
@@ -22,12 +22,8 @@ class BodyStateRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getBodyState(id: Int): BodyState? {
-        return bodyStateDao.getBodyState(id)?.toBodyState()
-    }
-
-    override suspend fun deleteBodyState(id: Int) {
-        bodyStateDao.deleteBodyState(id)
+    override suspend fun deleteBodyState(bodyState: BodyState) {
+        bodyStateDao.deleteBodyState(bodyState.toBodyStateEntity())
     }
 
 }
