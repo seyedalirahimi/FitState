@@ -29,25 +29,9 @@ class BodyStateViewModel @Inject constructor(
         }
     }
 
+    fun onAction(action: BodyStateAction){
 
-    fun onAction(action: BodyStateAction) {
-        when (action) {
-            is BodyStateAction.OnAddBodyState -> {
-                viewModelScope.launch {
-                    bodyStateRepository.upsert(action.bodyState)
-                }
-            }
-
-            is BodyStateAction.OnShowDialog -> {
-                _state.update { it.copy(isShowDialog = true) }
-            }
-
-            is BodyStateAction.OnCancelDialog -> {
-                _state.update { it.copy(isShowDialog = false) }
-            }
-        }
     }
-
 
     override fun onCleared() {
         super.onCleared()

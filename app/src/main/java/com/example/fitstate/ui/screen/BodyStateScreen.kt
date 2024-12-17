@@ -38,52 +38,32 @@ import kotlinx.datetime.Clock
 
 @Composable
 fun BodyStateScreenRoot(
+    modifier: Modifier = Modifier,
     viewModel: BodyStateViewModel
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     BodyStateScreen(
-        state = state, onAction = viewModel::onAction
+        modifier = modifier,
+        state = state,
+        onAction = viewModel::onAction
     )
 }
 
 @Composable
 fun BodyStateScreen(
-    state: BodyStateUiState, onAction: (BodyStateAction) -> Unit
+    modifier: Modifier = Modifier,
+    state: BodyStateUiState,
+    onAction: (BodyStateAction) -> Unit
 ) {
 
-    Column {
-        if (!state.isLoading && state.bodyStates.isNotEmpty()){
+    Column(modifier = modifier) {
+        if (!state.isLoading && state.bodyStates.isNotEmpty()) {
             WeightChart(bodyStates = state.bodyStates)
         }
-        Row(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
-        ) {
-            Button(
-                onClick = { onAction(BodyStateAction.OnShowDialog) }) {
-                Text("Add Body State")
-            }
-        }
-
         BodyStateList(bodyStates = state.bodyStates)
 
-    }
-
-
-    if (state.isShowDialog) {
-        AddBodyStateDialog(onDismissRequest = { onAction(BodyStateAction.OnCancelDialog) },
-            onSave = { weight, note ->
-                onAction(
-                    BodyStateAction.OnAddBodyState(
-                        BodyState(
-                            weight = weight,
-                            note = note,
-                            timestamp = Clock.System.now()
-                        )
-                    )
-                )
-            })
     }
 
 }
@@ -134,41 +114,3 @@ fun BodyStateItem(bodyState: BodyState) {
     }
 }
 
-
-@Composable
-fun AddBodyStateDialog(
-    onDismissRequest: () -> Unit, onSave: (Float, String?) -> Unit
-) {
-    var weight by remember { mutableStateOf("") }
-    var note by remember { mutableStateOf("") }
-
-    AlertDialog(onDismissRequest = onDismissRequest, title = { Text("Add Body State") }, text = {
-        Column {
-            OutlinedTextField(
-                value = weight,
-                onValueChange = { weight = it },
-                label = { Text("Weight (kg)") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = note,
-                onValueChange = { note = it },
-                label = { Text("note") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-            )
-        }
-    }, confirmButton = {
-        Button(onClick = {
-            onSave(
-                weight.toFloatOrNull() ?: 0f, note
-            )
-        }) {
-            Text("Save")
-        }
-    }, dismissButton = {
-        Button(onClick = onDismissRequest) {
-            Text("Cancel")
-        }
-    })
-}
