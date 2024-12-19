@@ -5,12 +5,14 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.fitstate.data.database.BodyStateEntity
+import com.example.fitstate.data.database.Converter
 
 @Database(
     entities = [BodyStateEntity::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
-@TypeConverters(InstantConverter::class)
+@TypeConverters(Converter::class)
 abstract class BodyStateDatabase : RoomDatabase() {
     abstract val bodyStateDao: BodyStateDao
 

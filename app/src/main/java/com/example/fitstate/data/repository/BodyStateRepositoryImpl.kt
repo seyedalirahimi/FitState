@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.ali.fitState.data.database.BodyStateDao
 import com.example.fitstate.data.database.toBodyState
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 
@@ -17,9 +19,19 @@ class BodyStateRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getBodyStates(): Flow<List<BodyState>> {
-        return bodyStateDao.getBodyStates().map { bodyStateEntities ->
-            bodyStateEntities.map { it.toBodyState() }
-        }
+        return bodyStateDao.getBodyStates()
+            .onEach {
+                println("BodyStateRepositoryImpl.getBodyStates: $it")
+            }
+            .map { bodyStateEntities ->
+                println("BodyStateRepositoryImpl.getBodyStates: $bodyStateEntities")
+                if (bodyStateEntities.isNullOrEmpty()) {
+                    println("BodyStateRepositoryImpl.getBodyStates: empty list")
+                    emptyList<BodyState>()
+                } else {
+                    bodyStateEntities.map { it.toBodyState() }
+                }
+            }
     }
 
     override suspend fun deleteBodyState(bodyState: BodyState) {

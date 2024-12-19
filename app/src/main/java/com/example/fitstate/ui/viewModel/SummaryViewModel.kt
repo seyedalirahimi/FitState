@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,26 +24,46 @@ class SummaryViewModel @Inject constructor(
 
     init {
         bodyStateCollectionJob = viewModelScope.launch {
-            bodyStateRepository.getBodyStates().collect { bodyStates ->
-                val high = bodyStates.maxBy { it.weight }.weight
-                val low = bodyStates.minBy { it.weight }.weight
-                val latest = bodyStates.last().weight
-                val trend = latest - low
-                val stats = listOf(
-                    Stat("High", high),
-                    Stat("Low", low),
-                    Stat("Trend", trend),
-                    Stat("Latest", latest)
-                )
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        recentBodyStates = bodyStates.takeLast(10),
-                        bodyStates = bodyStates,
-                        stats = stats
-                    )
+            bodyStateRepository.getBodyStates()
+                .catch { e ->
+                    _state.update {
+                        SummaryUiState(
+                            isLoading = false,
+                            errorMessage = e.message
+                        )
+                    }
+
                 }
-            }
+                .collect { bodyStates ->
+                    if (bodyStates.isEmpty()) {
+                        _state.update {
+                            SummaryUiState(
+                                isLoading = false,
+                                errorMessage = "No body states found"
+                            )
+                        }
+                    } else {
+                        val high = bodyStates.maxBy { it.weight }.weight
+                        val low = bodyStates.minBy { it.weight }.weight
+                        val latest = bodyStates.last().weight
+                        val trend = latest - low
+                        val stats = listOf(
+                            Stat("High", high),
+                            Stat("Low", low),
+                            Stat("Trend", trend),
+                            Stat("Latest", latest)
+                        )
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                recentBodyStates = bodyStates.takeLast(10),
+                                bodyStates = bodyStates,
+                                stats = stats
+                            )
+                        }
+                    }
+
+                }
         }
     }
 

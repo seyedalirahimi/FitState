@@ -19,8 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.fitstate.ui.screen.AddBodyStateDialog
-import com.example.fitstate.ui.screen.SummaryScreen
+import com.example.fitstate.ui.screen.LogMyWeightDialog
 import com.example.fitstate.ui.screen.SummaryScreenRoot
 import com.example.fitstate.ui.theme.FitStateTheme
 import com.example.fitstate.ui.viewModel.AddBodyStateAction
@@ -113,11 +112,14 @@ fun ContentScreen(
 
     if (showAddDialog) {
         val addBodyStateViewModel: AddBodyStateViewModel = hiltViewModel()
-        AddBodyStateDialog(
-            onDismiss = { onDialogDismiss() },
-            onSave = { weight, note ->
+        LogMyWeightDialog(
+            onDismissRequest = { onDialogDismiss() },
+            onAddClicked = { weight, note, date ->
+                println(date)
                 onDialogDismiss()
-                addBodyStateViewModel.onAction(AddBodyStateAction.OnSave(weight, note))
+                addBodyStateViewModel.onAction(
+                    AddBodyStateAction.OnSave(weight = weight, note = note, date = date)
+                )
             }
         )
     }

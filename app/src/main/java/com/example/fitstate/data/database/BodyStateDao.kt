@@ -15,7 +15,7 @@ interface BodyStateDao {
     suspend fun upsert(bodyStateEntity: BodyStateEntity)
 
     @Query("SELECT * FROM BodyStateEntity")
-    fun getBodyStates(): Flow<List<BodyStateEntity>>
+    fun getBodyStates(): Flow<List<BodyStateEntity>?>
 
     @Delete
     suspend fun deleteBodyState(bodyStateEntity: BodyStateEntity)

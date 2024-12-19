@@ -1,5 +1,6 @@
 package com.example.fitstate.ui.screen
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -20,22 +21,25 @@ fun WeightChart(
     modifier: Modifier = Modifier,
     bodyStates: List<BodyState>,
 ) {
-
-    val modelProducer = remember { CartesianChartModelProducer() }
-    LaunchedEffect(bodyStates) {
-        modelProducer.runTransaction {
-            lineSeries {
-                series(bodyStates.map { it.weight.toDouble() })
+    if (bodyStates.isEmpty()) {
+        Text("No data available")
+    } else {
+        val modelProducer = remember { CartesianChartModelProducer() }
+        LaunchedEffect(bodyStates) {
+            modelProducer.runTransaction {
+                lineSeries {
+                    series(bodyStates.map { it.weight.toDouble() })
+                }
             }
         }
+        CartesianChartHost(
+            chart = rememberCartesianChart(
+                rememberLineCartesianLayer(),
+                startAxis = VerticalAxis.rememberStart(),
+                bottomAxis = HorizontalAxis.rememberBottom(),
+            ),
+            modelProducer = modelProducer,
+            modifier = modifier
+        )
     }
-    CartesianChartHost(
-        chart = rememberCartesianChart(
-            rememberLineCartesianLayer(),
-            startAxis = VerticalAxis.rememberStart(),
-            bottomAxis = HorizontalAxis.rememberBottom(),
-        ),
-        modelProducer = modelProducer,
-        modifier = modifier
-    )
 }

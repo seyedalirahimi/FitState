@@ -4,19 +4,20 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.fitstate.ui.model.BodyState
 import kotlinx.datetime.Instant
+import java.util.Date
 
 @Entity
 data class BodyStateEntity(
     val weight: Float,
     val note: String?,
     @PrimaryKey
-    val timestamp: Instant
+    val date: Date
 )
 
 fun BodyStateEntity.toBodyState(): BodyState {
     return BodyState(
         weight = weight,
         note = note,
-        timestamp = timestamp
+        date = date
     )
 }
