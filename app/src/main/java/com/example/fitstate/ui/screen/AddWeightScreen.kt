@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -19,36 +20,54 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import java.text.SimpleDateFormat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.fitstate.formatToMonthDay
+import com.example.fitstate.ui.viewModel.AddBodyStateAction
+import com.example.fitstate.ui.viewModel.AddBodyStateViewModel
+import com.example.fitstate.ui.viewModel.LogMyWeightUiState
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 
-fun formatDate(date: Date): String {
-    val sdf = SimpleDateFormat("MMM dd", Locale.getDefault())
-    return sdf.format(date)
+@Composable
+fun AddWightDialogRoot(
+    modifier: Modifier = Modifier, viewModel: AddBodyStateViewModel, onDismissRequest: () -> Unit
+) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
+    AddWightDialog(modifier = modifier,
+        uiState = uiState.value,
+        onDateChange = viewModel::onDateChange,
+        onWeightChange = viewModel::onWeightChange,
+        onNotesChange = viewModel::onNotesChange,
+        onDismissRequest = onDismissRequest,
+        onAddClicked = {
+            viewModel.onAction(
+                AddBodyStateAction.OnSave,
+                onDismissRequest
+            )
+        })
 }
 
 @Composable
-fun LogMyWeightDialog(
+fun AddWightDialog(
     modifier: Modifier = Modifier,
+    uiState: LogMyWeightUiState = LogMyWeightUiState(),
+    onDateChange: (Date) -> Unit = {},
+    onWeightChange: (String) -> Unit = {},
+    onNotesChange: (String) -> Unit = {},
     onDismissRequest: () -> Unit,
-    onAddClicked: (Float, String?, Date) -> Unit
+    onAddClicked: () -> Unit
 ) {
-    val calendar = remember { Calendar.getInstance() }
-    var selectedDate by remember { mutableStateOf(formatDate(calendar.time)) }
-    var weight by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
+    println(uiState)
+    val calendar = Calendar.getInstance().apply { time = uiState.date }
     val context = LocalContext.current
+
 
     AlertDialog(onDismissRequest = onDismissRequest, title = {
         Text(
@@ -67,48 +86,59 @@ fun LogMyWeightDialog(
             ) {
                 IconButton(onClick = {
                     calendar.add(Calendar.DAY_OF_MONTH, -1)
-                    selectedDate = formatDate(calendar.time)
+                    onDateChange(calendar.time)
                 }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous Date")
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous Date"
+                    )
                 }
                 TextButton(onClick = {
                     showDatePicker(context, calendar) { updatedDate ->
                         calendar.time = updatedDate
-                        selectedDate = formatDate(calendar.time)
+                        onDateChange(calendar.time)
                     }
                 }) {
                     Text(
-                        text = selectedDate,
+                        text = uiState.date.formatToMonthDay(),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
                 IconButton(onClick = {
                     calendar.add(Calendar.DAY_OF_MONTH, 1)
-                    selectedDate = formatDate(calendar.time)
+                    onDateChange(calendar.time)
                 }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next Date")
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next Date"
+                    )
                 }
             }
             // Weight TextField
             OutlinedTextField(
-                value = weight,
-                onValueChange = { weight = it },
+                value = uiState.weight,
+                onValueChange = onWeightChange,
                 label = { Text("Weight") },
-                modifier = modifier.fillMaxWidth()
+                isError = uiState.weightError != null,
+                supportingText = {
+                    if (uiState.weightError != null) {
+                        Text(text = uiState.weightError, color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                modifier = modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 
             // Notes TextField
             OutlinedTextField(
-                value = notes,
-                onValueChange = { notes = it },
+                value = uiState.notes,
+                onValueChange = onNotesChange,
                 label = { Text("Notes") },
-                modifier = modifier.fillMaxWidth()
+                modifier = modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
         }
     }, confirmButton = {
         Button(onClick = {
-            onAddClicked(weight.toFloat(), notes, calendar.time)
-            onDismissRequest()
+            onAddClicked()
         }) {
             Text(text = "Add")
         }
@@ -134,10 +164,10 @@ fun showDatePicker(context: Context, calendar: Calendar, onDateSelected: (Date) 
 
 @Preview(showBackground = true)
 @Composable
-fun LogMyWeightDialogPreview(modifier: Modifier = Modifier) {
-    LogMyWeightDialog(onDismissRequest = {
+fun AddWeightDialogPreview(modifier: Modifier = Modifier) {
+    AddWightDialog(onDismissRequest = {
         println("OnSave")
-    }, onAddClicked = { _, _ ,_->
+    }, onAddClicked = {
         println("OnDelete")
     })
 }

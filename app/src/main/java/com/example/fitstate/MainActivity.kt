@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.fitstate.ui.screen.LogMyWeightDialog
+import com.example.fitstate.ui.screen.AddWightDialogRoot
 import com.example.fitstate.ui.screen.SummaryScreenRoot
 import com.example.fitstate.ui.theme.FitStateTheme
 import com.example.fitstate.ui.viewModel.AddBodyStateAction
@@ -112,15 +112,9 @@ fun ContentScreen(
 
     if (showAddDialog) {
         val addBodyStateViewModel: AddBodyStateViewModel = hiltViewModel()
-        LogMyWeightDialog(
+        AddWightDialogRoot (
+            viewModel = addBodyStateViewModel,
             onDismissRequest = { onDialogDismiss() },
-            onAddClicked = { weight, note, date ->
-                println(date)
-                onDialogDismiss()
-                addBodyStateViewModel.onAction(
-                    AddBodyStateAction.OnSave(weight = weight, note = note, date = date)
-                )
-            }
         )
     }
 }
@@ -136,9 +130,9 @@ val bottomNavigationItems = listOf(
         unSelectedIcon = Icons.Filled.AddCircle
     ),
     BottomNavigationItem(
-        title = "Settings",
-        selectedIcon = Icons.Filled.Settings,
-        unSelectedIcon = Icons.Outlined.Settings
+        title = "Logs",
+        selectedIcon = Icons.Filled.Info,
+        unSelectedIcon = Icons.Outlined.Info
     )
 )
 

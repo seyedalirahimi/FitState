@@ -9,9 +9,5 @@ import javax.inject.Inject
 
 
 sealed interface AddBodyStateAction {
-    data class OnSave(
-        val weight: Float,
-        val note: String?,
-        val date : Date
-    ) : AddBodyStateAction
+    data object OnSave: AddBodyStateAction
 }
