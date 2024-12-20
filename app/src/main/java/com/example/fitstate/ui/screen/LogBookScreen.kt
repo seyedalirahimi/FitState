@@ -180,7 +180,7 @@ fun WeeklyRateText(rate: Float?, modifier: Modifier = Modifier) {
     val isPositive = rate > 0
     val cardColor = if (isPositive) Color.Red else Color.Green
     val arrowIcon =
-        if (isPositive) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp
+        if (isPositive) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown
 
     Card(
         modifier = modifier,
