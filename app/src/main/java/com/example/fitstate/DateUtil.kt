@@ -10,3 +10,9 @@ fun Date.formatToMonthDay(): String {
     return sdf.format(this)
 }
 
+fun Date.formatToDay(): String {
+    val sdf = SimpleDateFormat("dd", Locale.getDefault())
+    return sdf.format(this)
+}
+
+

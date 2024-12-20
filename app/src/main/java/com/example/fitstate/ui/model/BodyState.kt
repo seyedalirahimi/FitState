@@ -1,6 +1,5 @@
 package com.example.fitstate.ui.model
 
-import kotlinx.datetime.Instant
 import com.example.fitstate.data.database.BodyStateEntity
 import java.util.Date
 
