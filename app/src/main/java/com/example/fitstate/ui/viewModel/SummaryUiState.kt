@@ -2,7 +2,6 @@ package com.example.fitstate.ui.viewModel
 
 import com.example.fitstate.ui.model.BodyState
 import com.example.fitstate.ui.model.Stat
-import java.lang.Error
 
 data class SummaryUiState(
     val isLoading: Boolean = true,

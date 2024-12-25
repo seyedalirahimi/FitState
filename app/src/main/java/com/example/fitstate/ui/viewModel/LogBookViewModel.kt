@@ -6,6 +6,7 @@ import com.example.fitstate.data.repository.BodyStateRepository
 import com.example.fitstate.ui.model.Log
 import com.example.fitstate.ui.model.MonthlyLog
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,8 +27,6 @@ class LogBookViewModel @Inject constructor(
 
         viewModelScope.launch {
             bodyStateRepository.getBodyStates().collect { bodyStates ->
-
-
                 val dateFormat = SimpleDateFormat("MMM yyyy", Locale.getDefault())
                 val sortedBodyStates = bodyStates.sortedBy { it.date }
                 val logs = bodyStates.sortedBy { it.date }.mapIndexed { index, bodyState ->
@@ -37,16 +36,20 @@ class LogBookViewModel @Inject constructor(
                         val previousWeight = sortedBodyStates[index - 1].weight
                         bodyState.weight - previousWeight
                     } else null
-                    Log(bodyState = bodyState, movingAverage = movingAverage, weeklyRate = weeklyRate)
+                    Log(
+                        bodyState = bodyState,
+                        movingAverage = movingAverage,
+                        weeklyRate = weeklyRate
+                    )
                 }
 
                 val sortedLogs = logs.sortedByDescending { it.bodyState.date }
                 val groupedByMonth = sortedLogs.groupBy { dateFormat.format(it.bodyState.date) }
                 val monthlyLogs = groupedByMonth.map { (month, states) ->
-                        MonthlyLog(
-                            month = month,
-                            logs = states
-                        )
+                    MonthlyLog(
+                        month = month,
+                        logs = states
+                    )
                 }
 
                 _uiState.update {
@@ -63,7 +66,7 @@ class LogBookViewModel @Inject constructor(
 
 
 data class LogBookUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val monthlyLogs: List<MonthlyLog> = emptyList(),
     val errorMessage: String? = null
 

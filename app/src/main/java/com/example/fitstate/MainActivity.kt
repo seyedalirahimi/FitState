@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
 import com.example.fitstate.ui.screen.AddWightDialogRoot
 import com.example.fitstate.ui.screen.LogBookScreenRoot
 import com.example.fitstate.ui.screen.SummaryScreenRoot
@@ -52,107 +54,19 @@ class MainActivity : ComponentActivity() {
             isSplashScreenVisible = false
         }
         splashScreen.setKeepOnScreenCondition { isSplashScreenVisible }
-        enableEdgeToEdge()
 
+
+        enableEdgeToEdge()
         setContent {
             FitStateTheme {
-                MainScreen()
+                val navController = rememberNavController()
+                Scaffold(bottomBar = { BottomBar(navController = navController) },
+                    content = { innerPadding ->
+                        FitStateNavGraph(
+                            navController = navController, modifier = Modifier.padding(innerPadding)
+                        )
+                    })
             }
         }
     }
 }
-
-@Composable
-fun MainScreen() {
-    var selectedItem by rememberSaveable { mutableIntStateOf(0) }
-    var showAddDialog by rememberSaveable { mutableStateOf(false) }
-
-    Scaffold(
-        bottomBar = {
-            FitStateBottomNavigation(
-                selectedItem = selectedItem,
-                onItemSelected = { index ->
-                    if (index == 1) showAddDialog = true else selectedItem = index
-                }
-            )
-        }
-    ) { padding ->
-        ContentScreen(
-            selectedItem = selectedItem,
-            padding = padding,
-            onDialogDismiss = { showAddDialog = false },
-            showAddDialog = showAddDialog
-        )
-    }
-}
-
-@Composable
-fun FitStateBottomNavigation(selectedItem: Int, onItemSelected: (Int) -> Unit) {
-    NavigationBar {
-        bottomNavigationItems.forEachIndexed { index, item ->
-            NavigationBarItem(
-                selected = selectedItem == index,
-                onClick = { onItemSelected(index) },
-                label = { if (item.showTitle) Text(item.title) },
-                icon = {
-                    val iconToDisplay =
-                        if (selectedItem == index) item.selectedIcon else item.unSelectedIcon
-                    Icon(iconToDisplay, contentDescription = item.title)
-                }
-            )
-        }
-    }
-}
-
-@Composable
-fun ContentScreen(
-    selectedItem: Int,
-    padding: PaddingValues,
-    onDialogDismiss: () -> Unit,
-    showAddDialog: Boolean
-) {
-    when (selectedItem) {
-        0 -> {
-            val summaryViewModel: SummaryViewModel = hiltViewModel()
-            SummaryScreenRoot(Modifier, summaryViewModel)
-        }
-
-        2 -> {
-            val logBookViewModel: LogBookViewModel = hiltViewModel()
-            LogBookScreenRoot(Modifier, logBookViewModel)
-
-        }
-    }
-
-    if (showAddDialog) {
-        val addBodyStateViewModel: AddBodyStateViewModel = hiltViewModel()
-        AddWightDialogRoot (
-            viewModel = addBodyStateViewModel,
-            onDismissRequest = { onDialogDismiss() },
-        )
-    }
-}
-
-val bottomNavigationItems = listOf(
-    BottomNavigationItem(
-        title = "Summary", selectedIcon = Icons.Filled.Home, unSelectedIcon = Icons.Outlined.Home
-    ),
-    BottomNavigationItem(
-        showTitle = false,
-        title = "Add",
-        selectedIcon = Icons.Filled.AddCircle,
-        unSelectedIcon = Icons.Filled.AddCircle
-    ),
-    BottomNavigationItem(
-        title = "LogBook",
-        selectedIcon = Icons.Filled.Info,
-        unSelectedIcon = Icons.Outlined.Info
-    )
-)
-
-data class BottomNavigationItem(
-    val showTitle: Boolean = true,
-    val title: String,
-    val selectedIcon: ImageVector,
-    val unSelectedIcon: ImageVector
-)

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -49,8 +50,7 @@ private fun LogBookScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 8.dp)
-            .padding(top = 48.dp),
+            .padding(horizontal = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
@@ -58,28 +58,31 @@ private fun LogBookScreen(
             style = MaterialTheme.typography.titleLarge,
             modifier = modifier.align(Alignment.CenterHorizontally)
         )
-
-
-
-        LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(uiState.monthlyLogs) { monthlyLog ->
-                Card(
-                    modifier = modifier.fillMaxWidth(),
-                    elevation = CardDefaults.elevatedCardElevation(4.dp)
-                ) {
-                    Column(modifier = modifier.padding(16.dp)) {
-                        MonthlyHeader(month = monthlyLog.month)
-                        TableHeader(modifier = modifier)
-                        monthlyLog.logs.forEach { log ->
-                            LogEntryRow(log = log)
+        if (uiState.isLoading) {
+            CircularProgressIndicator(
+                modifier = modifier.align(Alignment.CenterHorizontally)
+            )
+        } else {
+            LazyColumn(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(uiState.monthlyLogs) { monthlyLog ->
+                    Card(
+                        modifier = modifier.fillMaxWidth(),
+                        elevation = CardDefaults.elevatedCardElevation(4.dp)
+                    ) {
+                        Column(modifier = modifier.padding(16.dp)) {
+                            MonthlyHeader(month = monthlyLog.month)
+                            TableHeader(modifier = modifier)
+                            monthlyLog.logs.forEach { log ->
+                                LogEntryRow(log = log)
+                            }
                         }
-                    }
 
+                    }
                 }
             }
         }
@@ -170,9 +173,7 @@ fun TableHeader(modifier: Modifier = Modifier) {
 fun WeeklyRateText(rate: Float?, modifier: Modifier = Modifier) {
     if (rate == null) {
         Text(
-            text = "—",
-            color = Color.Gray,
-            modifier = modifier
+            text = "—", color = Color.Gray, modifier = modifier
         )
         return
     }
@@ -183,12 +184,10 @@ fun WeeklyRateText(rate: Float?, modifier: Modifier = Modifier) {
         if (isPositive) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown
 
     Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = cardColor)
+        modifier = modifier, colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
