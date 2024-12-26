@@ -21,9 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.fitstate.ui.model.BodyState
+import com.example.fitstate.ui.model.Stat
 import com.example.fitstate.ui.viewModel.SummaryUiState
 import com.example.fitstate.ui.viewModel.SummaryViewModel
-
+import java.util.*
 
 @Composable
 fun SummaryScreenRoot(
@@ -31,14 +33,12 @@ fun SummaryScreenRoot(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     SummaryScreen(state = state.value, modifier = modifier)
-
 }
 
 @Composable
 fun SummaryScreen(
     state: SummaryUiState, modifier: Modifier = Modifier
 ) {
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -54,7 +54,6 @@ fun SummaryScreen(
         Card(
             modifier = modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(4.dp)
         ) {
-
             Column(
                 modifier = modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -82,7 +81,6 @@ fun SummaryScreen(
             }
         }
 
-
         Spacer(modifier = Modifier.height(8.dp))
 
         Card(
@@ -104,7 +102,6 @@ fun SummaryScreen(
                 }
             }
         }
-
     }
 }
 
@@ -131,13 +128,45 @@ fun StateItem(
             )
         }
     }
-
 }
 
 
-@Preview
+// Previews
+@Preview(showBackground = true)
 @Composable
 private fun SummaryScreenPreview() {
-    SummaryScreen(state = SummaryUiState())
+    SummaryScreen(
+        state = SummaryUiState(
+            isLoading = false,
+            recentBodyStates = listOf(
+                BodyState(weight = 70.5f, date = Date()),
+                BodyState(weight = 71.0f, date = Date())
+            ),
+            bodyStates = listOf(
+                BodyState(weight = 69.5f, date = Date()),
+                BodyState(weight = 72.0f, date = Date())
+            ),
+            stats = listOf(
+                Stat(name = "BMI", value = 22.5f),
+                Stat(name = "Goal", value = 70f)
+            )
+        )
+    )
 }
 
+@Preview(showBackground = true)
+@Composable
+private fun StateItemPreview() {
+    StateItem(name = "BMI", value = 22.5f)
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun WeightChartPreview() {
+    WeightChart(
+        bodyStates = listOf(
+            BodyState(weight = 70.5f, date = Date()),
+            BodyState(weight = 71.0f, date = Date())
+        )
+    )
+}

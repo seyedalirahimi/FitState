@@ -5,7 +5,7 @@ import java.util.Date
 
 data class BodyState(
     val weight: Float,
-    val notes: String?,
+    val notes: String? = "",
     val date: Date
 )
 

@@ -20,6 +20,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -180,12 +181,20 @@ fun showDatePicker(context: Context, date: Date, onDateSelected: (Date) -> Unit)
     ).show()
 }
 
+// Previews
 @Preview(showBackground = true)
 @Composable
 fun AddWeightDialogPreview(modifier: Modifier = Modifier) {
-    AddWightDialog(onDismiss = {
-        println("OnSave")
-    }, onAddClicked = {
-        println("OnDelete")
-    })
+    AddWightDialog(
+        uiState = LogMyWeightUiState(
+            date = Date(),
+            weight = "70.5",
+            notes = "Felt great!",
+            isSaved = false
+        ),
+        onDismiss = { println("Dismiss Clicked") },
+        onAddClicked = { println("Add Clicked") }
+    )
 }
+
+

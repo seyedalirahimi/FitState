@@ -12,26 +12,23 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fitstate.formatToDay
-import com.example.fitstate.formatToMonthDay
+import com.example.fitstate.ui.model.BodyState
 import com.example.fitstate.ui.model.Log
+import com.example.fitstate.ui.model.MonthlyLog
 import com.example.fitstate.ui.viewModel.LogBookUiState
 import com.example.fitstate.ui.viewModel.LogBookViewModel
+import java.util.Calendar
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
-
 
 @Composable
 fun LogBookScreenRoot(
@@ -41,7 +38,6 @@ fun LogBookScreenRoot(
 
     LogBookScreen(modifier = modifier, uiState = uiState.value)
 }
-
 
 @Composable
 private fun LogBookScreen(
@@ -109,7 +105,7 @@ fun LogEntryRow(modifier: Modifier = Modifier, log: Log) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         TableCell(modifier = modifier.weight(1f)) {
-            Text(text = log.bodyState.date.formatToDay())
+            Text(text = log.bodyState.date.formatToDay()) // Replace with your formatter
         }
 
         TableCell(modifier = modifier.weight(1f)) {
@@ -125,7 +121,6 @@ fun LogEntryRow(modifier: Modifier = Modifier, log: Log) {
         }
     }
 }
-
 
 @Composable
 fun TableCell(
@@ -205,4 +200,48 @@ fun WeeklyRateText(rate: Float?, modifier: Modifier = Modifier) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewLogBookScreen() {
+    LogBookScreen(
+        uiState = LogBookUiState(
+            isLoading = false, monthlyLogs = listOf(
+                MonthlyLog(
+                    month = "December 2024", logs = listOf(
+                        Log(
+                            bodyState = BodyState(
+                                weight = 72.5f,
+                                date = Calendar.getInstance().apply { set(2024, 11, 1) }.time,
+                                notes = ""
+                            ), movingAverage = 72.4f, weeklyRate = -0.2f
+                        )
+                    )
+                )
+            )
+        )
+    )
+}
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewLogEntryRow() {
+    LogEntryRow(
+        log = Log(
+            bodyState = BodyState(
+                weight = 72.5f, date = Calendar.getInstance().apply { set(2024, 11, 1) }.time,
+            ), movingAverage = 72.4f, weeklyRate = -0.2f
+        )
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewTableHeader() {
+    TableHeader()
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewWeeklyRateText() {
+    WeeklyRateText(rate = -0.5f)
+}
