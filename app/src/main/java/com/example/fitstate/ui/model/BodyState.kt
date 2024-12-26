@@ -5,10 +5,10 @@ import java.util.Date
 
 data class BodyState(
     val weight: Float,
-    val note: String?,
+    val notes: String?,
     val date: Date
 )
 
 fun BodyState.toBodyStateEntity(): BodyStateEntity {
-    return BodyStateEntity(weight, note, date)
+    return BodyStateEntity(weight, notes, date)
 }

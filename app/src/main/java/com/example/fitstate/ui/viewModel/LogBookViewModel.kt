@@ -15,6 +15,15 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
 
+
+
+data class LogBookUiState(
+    val isLoading: Boolean = true,
+    val monthlyLogs: List<MonthlyLog> = emptyList(),
+    val errorMessage: String? = null
+
+)
+
 @HiltViewModel
 class LogBookViewModel @Inject constructor(
     private val bodyStateRepository: BodyStateRepository
@@ -65,9 +74,3 @@ class LogBookViewModel @Inject constructor(
 }
 
 
-data class LogBookUiState(
-    val isLoading: Boolean = true,
-    val monthlyLogs: List<MonthlyLog> = emptyList(),
-    val errorMessage: String? = null
-
-)

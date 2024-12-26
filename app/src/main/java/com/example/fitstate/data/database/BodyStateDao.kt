@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Upsert
 import com.example.fitstate.data.database.BodyStateEntity
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 @Dao
 interface BodyStateDao {
@@ -19,4 +20,7 @@ interface BodyStateDao {
 
     @Delete
     suspend fun deleteBodyState(bodyStateEntity: BodyStateEntity)
+
+    @Query("SELECT * FROM BodyStateEntity WHERE date = :date")
+    suspend fun getBodyState(date: Date): BodyStateEntity?
 }

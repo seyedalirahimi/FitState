@@ -3,7 +3,6 @@ package com.example.fitstate.data.database
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.fitstate.ui.model.BodyState
-import kotlinx.datetime.Instant
 import java.util.Date
 
 @Entity
@@ -17,7 +16,7 @@ data class BodyStateEntity(
 fun BodyStateEntity.toBodyState(): BodyState {
     return BodyState(
         weight = weight,
-        note = note,
+        notes = note,
         date = date
     )
 }

@@ -36,40 +36,56 @@ import java.util.Date
 
 @Composable
 fun AddWightDialogRoot(
-    modifier: Modifier = Modifier, viewModel: AddBodyStateViewModel, onDismissRequest: () -> Unit
+    modifier: Modifier = Modifier, viewModel: AddBodyStateViewModel, onDismiss: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
-    AddWightDialog(modifier = modifier,
+    AddWightDialog(
+        modifier = modifier,
         uiState = uiState.value,
-        onDateChange = viewModel::onDateChange,
-        onWeightChange = viewModel::onWeightChange,
-        onNotesChange = viewModel::onNotesChange,
-        onDismissRequest = onDismissRequest,
+        onDateChange = { dayChange ->
+            viewModel.onAction(
+                AddBodyStateAction.OnDateChange(dayChange),
+            )
+        },
+        onWeightChange = { weight ->
+            viewModel.onAction(
+                AddBodyStateAction.OnWeightChange(weight),
+            )
+        },
+        onNotesChange = { notes ->
+            viewModel.onAction(
+                AddBodyStateAction.OnNotesChange(notes),
+            )
+        },
+        onDismiss = {
+            onDismiss()
+        },
         onAddClicked = {
             viewModel.onAction(
                 AddBodyStateAction.OnSave,
-                onDismissRequest
             )
-        })
+        }
+    )
 }
 
 @Composable
 fun AddWightDialog(
     modifier: Modifier = Modifier,
     uiState: LogMyWeightUiState = LogMyWeightUiState(),
-    onDateChange: (Date) -> Unit = {},
+    onDateChange: (Int) -> Unit = {},
+    onDateSet: (Date) -> Unit = {},
     onWeightChange: (String) -> Unit = {},
     onNotesChange: (String) -> Unit = {},
-    onDismissRequest: () -> Unit,
+    onDismiss: () -> Unit,
     onAddClicked: () -> Unit
 ) {
-    println(uiState)
-    val calendar = Calendar.getInstance().apply { time = uiState.date }
     val context = LocalContext.current
+    if (uiState.isSaved) {
+        onDismiss()
+    }
 
-
-    AlertDialog(onDismissRequest = onDismissRequest, title = {
+    AlertDialog(onDismissRequest = onDismiss, title = {
         Text(
             text = "Log my weight", style = MaterialTheme.typography.titleLarge
         )
@@ -85,17 +101,15 @@ fun AddWightDialog(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
-                    calendar.add(Calendar.DAY_OF_MONTH, -1)
-                    onDateChange(calendar.time)
+                    onDateChange(-1)
                 }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous Date"
                     )
                 }
                 TextButton(onClick = {
-                    showDatePicker(context, calendar) { updatedDate ->
-                        calendar.time = updatedDate
-                        onDateChange(calendar.time)
+                    showDatePicker(context, uiState.date) { updatedDate ->
+                        onDateSet(updatedDate)
                     }
                 }) {
                     Text(
@@ -104,8 +118,7 @@ fun AddWightDialog(
                     )
                 }
                 IconButton(onClick = {
-                    calendar.add(Calendar.DAY_OF_MONTH, 1)
-                    onDateChange(calendar.time)
+                    onDateChange(+1)
                 }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next Date"
@@ -120,7 +133,9 @@ fun AddWightDialog(
                 isError = uiState.weightError != null,
                 supportingText = {
                     if (uiState.weightError != null) {
-                        Text(text = uiState.weightError, color = MaterialTheme.colorScheme.error)
+                        Text(
+                            text = uiState.weightError, color = MaterialTheme.colorScheme.error
+                        )
                     }
                 },
                 modifier = modifier.fillMaxWidth(),
@@ -143,13 +158,16 @@ fun AddWightDialog(
             Text(text = "Add")
         }
     }, dismissButton = {
-        TextButton(onClick = onDismissRequest) {
+        TextButton(
+            onClick = onDismiss
+        ) {
             Text(text = "Cancel")
         }
     })
 }
 
-fun showDatePicker(context: Context, calendar: Calendar, onDateSelected: (Date) -> Unit) {
+fun showDatePicker(context: Context, date: Date, onDateSelected: (Date) -> Unit) {
+    val calendar: Calendar = Calendar.getInstance().apply { time = date }
     DatePickerDialog(
         context,
         { _, year, month, dayOfMonth ->
@@ -165,7 +183,7 @@ fun showDatePicker(context: Context, calendar: Calendar, onDateSelected: (Date) 
 @Preview(showBackground = true)
 @Composable
 fun AddWeightDialogPreview(modifier: Modifier = Modifier) {
-    AddWightDialog(onDismissRequest = {
+    AddWightDialog(onDismiss = {
         println("OnSave")
     }, onAddClicked = {
         println("OnDelete")

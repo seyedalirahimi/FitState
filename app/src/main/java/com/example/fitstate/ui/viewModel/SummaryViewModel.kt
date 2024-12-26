@@ -3,6 +3,7 @@ package com.example.fitstate.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fitstate.data.repository.BodyStateRepository
+import com.example.fitstate.ui.model.BodyState
 import com.example.fitstate.ui.model.Stat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -12,6 +13,18 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+
+data class SummaryUiState(
+    val isLoading: Boolean = true,
+    val recentBodyStates: List<BodyState> = emptyList(),
+    val bodyStates: List<BodyState> = emptyList(),
+    val stats: List<Stat> = emptyList(),
+    val errorMessage: String? = null
+)
+
+sealed interface SummaryAction {}
+
 
 @HiltViewModel
 class SummaryViewModel @Inject constructor(
@@ -24,22 +37,18 @@ class SummaryViewModel @Inject constructor(
 
     init {
         bodyStateCollectionJob = viewModelScope.launch {
-            bodyStateRepository.getBodyStates()
-                .catch { e ->
+            bodyStateRepository.getBodyStates().catch { e ->
                     _state.update {
                         SummaryUiState(
-                            isLoading = false,
-                            errorMessage = e.message
+                            isLoading = false, errorMessage = e.message
                         )
                     }
 
-                }
-                .collect { bodyStates ->
+                }.collect { bodyStates ->
                     if (bodyStates.isEmpty()) {
                         _state.update {
                             SummaryUiState(
-                                isLoading = false,
-                                errorMessage = "No body states found"
+                                isLoading = false, errorMessage = "No body states found"
                             )
                         }
                     } else {
