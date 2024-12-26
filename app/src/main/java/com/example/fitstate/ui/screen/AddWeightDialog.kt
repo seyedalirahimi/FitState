@@ -49,6 +49,9 @@ fun AddWightDialogRoot(
                 AddBodyStateAction.OnDateChange(dayChange),
             )
         },
+        onDateSet = { newDate ->
+            viewModel.onAction(AddBodyStateAction.OnDateSet(newDate))
+        },
         onWeightChange = { weight ->
             viewModel.onAction(
                 AddBodyStateAction.OnWeightChange(weight),
